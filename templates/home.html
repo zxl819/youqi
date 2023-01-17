@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧报修管理系统</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/layui.css">
+    <link rel="stylesheet" href="static/css/font-awesome.min.css">
+    <style>
+        .m-nav {
+            background: #1E9FFF !important
+        }
+
+        .layui-layout-admin .layui-logo {
+            color: white;
+        }
+
+        iframe {
+            display: block; /* iframes are inline by default */
+            background: white;
+            border: none; /* Reset default border */
+            height: calc(100vh - 104px); /* Viewport-relative units */
+            width: 100vw;
+        }
+
+    </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin ">
+    <div class="layui-header m-nav">
+        <div class="layui-logo">智慧报修管理系统</div>
+        <ul class="layui-nav layui-layout-left layui-bg-blue ">
+            <li class="layui-nav-item layui-this"><a href="/repair/listView" target="frame">报修管理</a></li>
+            <li class="layui-nav-item"><a href="{{ url_for('user.listView',page=1) }}" target="frame">用户管理</a></li>
+            <span class="layui-nav-bar"></span></ul>
+        <ul class="layui-nav layui-layout-right layui-bg-blue">
+            <li class="layui-nav-item">
+                <a href="javascript:;">{{ userName }}<span class="layui-nav-more"></span></a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/logout">退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <iframe class="m-frame" id="frame" name="frame" src="/repair/listView"></iframe>
+
+    <div class="layui-footer" style="left: 0;text-align: center;">
+        © 王老师 & [ 微信公众号：JeenWang ，交流微信号 ：study2100 ]
+    </div>
+</div>
+
+<script src="/static/layui.js"></script>
+<script src="/static/jquery-2.1.4.js"></script>
+<script>
+    layui.use('element', function () {
+        var element = layui.element;
+
+    });
+</script>
+</body>
+</html>

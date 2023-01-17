@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧报修管理系统</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
+</head>
+<body>
+<div class="login-div">
+    <form class="layui-form" action="">
+        <h2>用户登录</h2>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" lay-verify="required" lay-reqtext="用户名是必填项，不能为空？" autocomplete="off"
+                       placeholder="请输入用户名" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" lay-verify="required" lay-reqtext="密码是必填项，不能为空？"
+                       placeholder="请输入密码"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <button type="button" lay-submit="" lay-filter="login" class="layui-btn layui-btn-normal login-bt">登录</button>
+
+    </form>
+</div>
+</body>
+<script src="/static/layui.js"></script>
+<script src="/static/jquery-2.1.4.js"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('submit(login)', function (data) {
+            $.ajax({
+                url: '/api/signIn',
+                type: "POST",
+                data: data.field,
+                success: function (data) {
+                    if (data.status == 200) {
+                        layer.msg('登录成功！', {icon: 1});
+                        window.location.href="/home"
+                    } else {
+                        layer.msg(data.errmsg, {icon: 5});
+                    }
+                },
+                complete: function () {
+                },
+                error: function (data) {
+                    layer.msg('登录失败，请重试！', {icon: 5});
+                }
+            });
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,31 @@
+
+body {
+    height: 100%;
+    width: 100%;
+    background: url('../images/bg.png') repeat;
+    background-size: cover;
+
+}
+
+.login-div {
+    width: 400px;
+    height: 200px;
+    border: 1px solid #dedede;
+    padding: 40px;
+    border-radius: 10px;
+    position: absolute;
+    top: 50%;
+    margin-top: -160px;
+    left: calc(50% - 220px);
+    background: white;
+}
+
+h2 {
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+.login-bt {
+    margin-left: 110px;
+
+}

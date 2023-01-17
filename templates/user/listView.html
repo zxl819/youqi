@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/user.css">
+</head>
+<body>
+<div class="content">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>用户管理</legend>
+    </fieldset>
+    <xblock>
+        <button class="layui-btn" onclick="add()"><i class="layui-icon"></i>添加</button>
+        <button class="layui-btn layui-btn-normal" onclick="location.reload();">刷新</button>
+{#        <span class="x-right" style="line-height:40px">共有数据：<font id="total">{{ pagination.total }}</font> 条</span>#}
+    </xblock>
+    <div class="layui-form">
+        <table class="layui-table">
+            <colgroup>
+                <col width="150">
+                <col width="150">
+                <col width="200">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>用户名</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in infos %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.userName }}</td>
+                    <td>
+                        <a title="编辑" class="layui-btn layui-btn-normal layui-btn-xs" onclick="editItem({{ user.id }})">编辑</a>
+                        <a title="删除" onclick="deleteItem(this,{{ user.id }})"
+                           class="layui-btn layui-btn-danger layui-btn-xs">删除</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% import 'pages.html' as pg %}
+    {# user.listView 名字来源：user表示user路由的前缀，listview 表示当前地址路由的名称，即：del 后的名称#}
+    {{ pg.my_paginate(pagination,'user.listView') }}
+</div>
+</body>
+<script src="/static/layui.js"></script>
+<script src="/static/jquery-2.1.4.js"></script>
+<script>
+    layui.use(['form'], function () {
+        var layer = layui.layer;
+    });
+
+    function add() {
+        var url = "/user/addView";
+        layer.open({
+            type: 2,
+            title: '添加用户',
+            shadeClose: true,
+            shade: false,
+            maxmin: false, //开启最大化最小化按钮
+            area: ['600px', '400px'],
+            content: url
+        });
+    }
+
+      function add() {
+        var url = "{{ url_for('user.addView') }}";
+        layer.open({
+            type: 2,
+            title: '添加用户',
+            shadeClose: true,
+            shade: false,
+            maxmin: false, //开启最大化最小化按钮
+            area: ['600px', '400px'],
+            content: url
+        });
+    }
+
+
+    function editItem(userId) {
+        var url = "/user/editView?userId=" + userId;
+        layer.open({
+            type: 2,
+            title: '修改密码',
+            shadeClose: true,
+            shade: false,
+            maxmin: false, //开启最大化最小化按钮
+            area: ['600px', '400px'],
+            content: url
+        });
+    }
+
+    function reloadData() {
+        window.location.reload()
+    }
+
+    function deleteItem(item, id) {
+        layer.confirm('确定要删除本条记录吗？', {
+            btn: ['确定', '取消'] //可以无限个按钮
+        }, function (index, layero) {
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: "/user/delete",
+                data: {"id": id},
+                async: false,
+                error: function (request) {
+                    return false;
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        $(item).parent().parent().remove();
+                    }
+                    layer.msg(data.errmsg);
+                    return false;
+                }
+            });
+            layer.close(index);
+        }, function (index) {
+            layer.close(index);
+        });
+    }
+</script>
+</html>

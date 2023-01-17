@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>报修列表</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/user.css">
+    <style>
+        .layui-select-title {
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>报修管理</legend>
+    </fieldset>
+    <div class="layui-row">
+        <div class="layui-form layui-col-md12 x-so" style="display:flex;">
+            <select class="layui-input" name="status" id="status">
+                <option value="">请选择报修状态</option>
+                <option value="1">新报修</option>
+                <option value="2">维修中</option>
+                <option value="3">已完成</option>
+            </select>
+            <input class="layui-input" style="margin-left: 10px;" placeholder="请输入报修人姓名" name="applicantName"
+                   id="applicantName">
+            <button class="layui-btn" style="margin-left: 10px;" onclick="search()"><i
+                    class="layui-icon"></i></button>
+            <button class="layui-btn layui-btn-warm" onclick="exportData()">导出报表</button>
+            <button class="layui-btn layui-btn-normal" onclick="location.reload();">刷新</button>
+        </div>
+    </div>
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+</div>
+</body>
+<script src="/static/layui.js"></script>
+<script src="/static/jquery-2.1.4.js"></script>
+<script>
+
+    var table;
+
+    function search() {
+        getData();
+    }
+
+    function getData() {
+        table.render({
+            elem: '#test'
+            , url: '/repair/list?status=' + $("#status").val() + "&applicantName=" + $("#applicantName").val()
+            , title: '用户数据表'
+            , cols: [[
+                {field: 'id', title: 'ID', fixed: 'left', width: 80, unresize: true, sort: true}
+                , {field: 'applicantName', title: '报修人', width: 100, sort: true}
+                , {
+                    field: 'mobile', title: '联系电话', templet: function (res) {
+                        return '<em>' + res.mobile + '</em>'
+
+                    }
+                }
+                , {field: 'address', title: '报修地点',}
+                , {field: 'description', title: '问题描述'}
+                , {
+                    field: 'status', width: 100, title: '报修状态', width: 100, templet: function (res) {
+                        if (res.status == 1) {
+                            return '<em>新报修</em>'
+                        } else if (res.status == 2) {
+                            return '<em>维修中</em>'
+                        } else {
+                            return '<em>已完成</em>'
+                        }
+                    }
+                }
+                , {field: 'repairDate', title: '报修时间', width: 180, sort: true}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+        });
+
+    }
+
+    layui.use('table', function () {
+        table = layui.table;
+        getData();
+
+        //头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    break;
+
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            }
+            ;
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            var id = data.id;
+            console.log(data);
+            if (obj.event === 'del') {
+                layer.confirm('确定要删除本条记录吗？', {
+                    btn: ['确定', '取消'] //可以无限个按钮
+                }, function (index, layero) {
+                    $.ajax({
+                        cache: true,
+                        type: "POST",
+                        url: "/repair/delete",
+                        data: {"id": id},
+                        async: false,
+                        error: function (request) {
+                            return false;
+                        },
+                        success: function (data) {
+                            if (data.status == 200) {
+                                obj.del();
+                            }
+                            layer.msg(data.errmsg);
+                            return false;
+                        }
+                    });
+                    layer.close(index);
+                }, function (index) {
+                    layer.close(index);
+                });
+
+
+            } else if (obj.event === 'edit') {
+                var url = "/repair/editView/" + id;
+                layer.open({
+                    type: 2,
+                    title: '修改报修状态',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: false, //开启最大化最小化按钮
+                    area: ['600px', '400px'],
+                    content: url
+                });
+            }
+        });
+    });
+
+    function exportData() {
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: "/repair/exportData?status=" + $("#status").val() + "&applicantName=" + $("#applicantName").val(),
+            async: false,
+            error: function (request) {
+                return false;
+            },
+            success: function (result) {
+                console.log(result);
+                window.location.href = result;
+
+            },
+            complete: function () {
+
+            },
+            error: function (data) {
+                layer.msg('导出失败，请重试！', {icon: 5});
+            }
+        });
+
+    }
+
+
+    function reloadData() {
+        window.location.reload()
+    }
+
+
+</script>
+</html>

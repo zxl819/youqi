@@ -1,0 +1,17 @@
+.content{
+    margin-top: 20px;
+    margin-left: 12%;
+    margin-right: 12%;
+}
+xblock{
+    display: block;
+    margin-bottom: 10px;
+    line-height: 40px;
+    background-color: rgb(242, 242, 242);
+    padding: 5px;
+    border-radius: 0px 2px 2px 0px;
+    overflow: auto;
+}
+.x-right{
+    float: right;
+}
